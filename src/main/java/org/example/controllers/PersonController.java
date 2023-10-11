@@ -1,6 +1,6 @@
 package org.example.controllers;
 
-import org.example.model.Person;
+import org.example.models.Person;
 import org.example.services.PersonServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
