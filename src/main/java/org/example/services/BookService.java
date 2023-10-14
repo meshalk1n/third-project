@@ -1,6 +1,7 @@
 package org.example.services;
 
 import org.example.models.Book;
+import org.example.models.Person;
 import org.example.repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,12 +12,13 @@ import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
-public class BookServices {
+public class BookService {
 
     private final BookRepository bookRepository;
 
+
     @Autowired
-    public BookServices(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
 
@@ -43,5 +45,23 @@ public class BookServices {
     @Transactional
     public void delete(int id){
         bookRepository.deleteById(id);
+    }
+
+    public Optional<Person> getBookOwner (int id){
+        return bookRepository.findById(id).map(Book::getOwner);
+    }
+
+    @Transactional
+    public void release ( int id){
+        Book releasedBook = bookRepository.findById(id).get();
+        releasedBook.setOwner(null);
+        bookRepository.save(releasedBook);
+    }
+
+    @Transactional
+    public void assign ( int id, Person selectedPerson){
+        Book book = bookRepository.findById(id).get();
+        book.setOwner(selectedPerson);
+        bookRepository.save(book);
     }
 }

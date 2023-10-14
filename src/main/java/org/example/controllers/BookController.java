@@ -1,7 +1,9 @@
 package org.example.controllers;
 
 import org.example.models.Book;
-import org.example.services.BookServices;
+import org.example.models.Person;
+import org.example.services.BookService;
+import org.example.services.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,16 +11,20 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/books")
 public class BookController {
 
-    private final BookServices bookServices;
+    private final BookService bookServices;
+
+    private final PersonService personServices;
 
     @Autowired
-    public BookController(BookServices bookServices) {
+    public BookController(BookService bookServices, PersonService personServices) {
         this.bookServices = bookServices;
+        this.personServices = personServices;
     }
 
     @GetMapping()
@@ -43,8 +49,15 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public String processFetchBookById(@PathVariable("id") int id, Model model) {
+    public String processFetchBookById(@PathVariable("id") int id, Model model,
+                                       @ModelAttribute("person") Person person) {
         model.addAttribute("book", bookServices.findOne(id));
+        Optional<Person> bookOwner = bookServices.getBookOwner(id);
+        if(bookOwner.isPresent()){
+            model.addAttribute("owner", bookOwner.get());
+        }else{
+            model.addAttribute("people", personServices.findAll());
+        }
         return "books/id";
     }
 
@@ -68,5 +81,19 @@ public class BookController {
     public String processDeleteBook(@PathVariable("id") int id) {
         bookServices.delete(id);
         return "redirect:/books/";
+    }
+ ////////////////////////////////////
+    @PatchMapping("/{id}/release")
+    public String release(@PathVariable("id") int id){
+        bookServices.release(id);
+        return "redirect:/books/" + id;
+    }
+
+
+    @PatchMapping("/{id}/assign")
+    public String assign(@PathVariable("id") int id,
+                         @ModelAttribute("person") Person selectedPerson) throws Exception {
+        bookServices.assign(id, selectedPerson);
+        return "redirect:/books/" + id;
     }
 }

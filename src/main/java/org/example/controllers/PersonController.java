@@ -1,7 +1,8 @@
 package org.example.controllers;
 
 import org.example.models.Person;
-import org.example.services.PersonServices;
+import org.example.services.BookService;
+import org.example.services.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,11 +14,14 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/people")
 public class PersonController {
-    private final PersonServices personServices;
+    private final PersonService personServices;
+
+    private final BookService bookServices;
 
     @Autowired
-    public PersonController(PersonServices personServices) {
+    public PersonController(PersonService personServices, BookService bookServices) {
         this.personServices = personServices;
+        this.bookServices = bookServices;
     }
 
     @GetMapping()
@@ -44,6 +48,7 @@ public class PersonController {
     @GetMapping("/{id}")
     public String processFetchPersonById(@PathVariable("id") int id, Model model) {
         model.addAttribute("person", personServices.findOne(id));
+        model.addAttribute("books", personServices.getBooksByPersonId(id));
         return "people/id";
     }
 
