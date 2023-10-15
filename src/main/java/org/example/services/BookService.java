@@ -47,19 +47,22 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
+    //получаем владельца книги, если он есть
     public Optional<Person> getBookOwner (int id){
         return bookRepository.findById(id).map(Book::getOwner);
     }
 
+    //освобождает книгу
     @Transactional
-    public void release ( int id){
+    public void release (int id){
         Book releasedBook = bookRepository.findById(id).get();
-        releasedBook.setOwner(null);
-        bookRepository.save(releasedBook);
+            releasedBook.setOwner(null);
+            bookRepository.save(releasedBook);
     }
 
+    //назначает книгу
     @Transactional
-    public void assign ( int id, Person selectedPerson){
+    public void assign (int id, Person selectedPerson){
         Book book = bookRepository.findById(id).get();
         book.setOwner(selectedPerson);
         bookRepository.save(book);

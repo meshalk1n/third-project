@@ -4,11 +4,13 @@ import org.example.models.Book;
 import org.example.models.Person;
 import org.example.repositories.BookRepository;
 import org.example.repositories.PersonRepository;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,8 +53,17 @@ public class PersonService {
         personRepository.deleteById(id);
     }
 
-    @Transactional
-    public List<Book> getBooksByPersonId(int personId) {
-        return bookRepository.findBookById(personId);
+    //показывает, сколько взял книг человек
+    public List<Book> getBooksByPersonId(int id){
+        Optional<Person> person = personRepository.findById(id);
+
+        if(person.isPresent()){
+            Hibernate.initialize(person.get().getBooks());
+            //книги будут подгружены, но на всякий случай вызвать Hibernate.initialize()
+            return person.get().getBooks();
+        }
+        else {
+            return Collections.emptyList();
+        }
     }
 }

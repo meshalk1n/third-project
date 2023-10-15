@@ -82,17 +82,16 @@ public class BookController {
         bookServices.delete(id);
         return "redirect:/books/";
     }
- ////////////////////////////////////
+
     @PatchMapping("/{id}/release")
     public String release(@PathVariable("id") int id){
         bookServices.release(id);
         return "redirect:/books/" + id;
     }
 
-
     @PatchMapping("/{id}/assign")
     public String assign(@PathVariable("id") int id,
-                         @ModelAttribute("person") Person selectedPerson) throws Exception {
+                         @ModelAttribute("person") Person selectedPerson) {
         bookServices.assign(id, selectedPerson);
         return "redirect:/books/" + id;
     }
